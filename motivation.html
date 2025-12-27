@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Мотивация каждый день</title>
+  <meta name="description" content="Мотивационные цитаты каждые 10 секунд — для вдохновения и роста">
+
+  <!-- Font Awesome для иконок -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #000000, #111111);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      text-align: center;
+      padding: 20px;
+      transition: background 1s, color 0.5s;
+    }
+
+    body.light {
+      background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
+      color: #111;
+    }
+
+    body.light .author {
+      color: #555;
+    }
+
+    .quote {
+      font-size: 2rem;
+      max-width: 800px;
+      line-height: 1.6;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+      margin-bottom: 40px;
+    }
+
+    .quote.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .author {
+      font-style: italic;
+      font-size: 1.2rem;
+      opacity: 0.8;
+      transition: opacity 0.5s;
+    }
+
+    .controls {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    button {
+      width: 60px;
+      height: 60px;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.4rem;
+      transition: all 0.3s ease;
+      position: relative;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Темы кнопок */
+    body.light button#next-btn,
+    body.light button#copy-btn {
+      background: #000;
+      color: white;
+    }
+
+    body.light button#theme-toggle {
+      background: #ddd;
+      color: #111;
+    }
+
+    /* Эффект при наведении */
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Подсказки при наведении */
+    button::after {
+      content: attr(aria-label);
+      position: absolute;
+      bottom: -45px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    body.light button::after {
+      background: #111;
+    }
+
+    button:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Мобильные — убираем подсказки */
+    @media (max-width: 600px) {
+      button::after {
+        display: none;
+      }
+    }
+
+    /* Анимации */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="quote" id="quote-text">Добро пожаловать!</p>
+    <p class="author" id="quote-author">— Загрузка...</p>
+  </div>
+
+  <div class="controls">
+    <button id="next-btn" aria-label="Следующая цитата"><i class="fas fa-play"></i></button>
+    <button id="copy-btn" aria-label="Скопировать цитату"><i class="fas fa-copy"></i></button>
+    <button id="theme-toggle" aria-label="Светлая тема"><i class="fas fa-moon"></i></button>
+  </div>
+
+  <!-- Звук при смене цитаты -->
+  <audio id="sound" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" preload="auto"></audio>
+
+  <script>
+    const quotes = [
+      { text: "Ваше время ограничено, не тратьте его, живя чужой жизнью.", author: "Стив Джобс" },
+      { text: "Успех — это способность идти от неудачи к неудаче, не теряя энтузиазма.", author: "Уинстон Черчилль" },
+      { text: "Ты — единственный, кто может использовать твой потенциал.", author: "Альберт Эйнштейн" },
+      { text: "Начни с того, что имеешь. Используй то, что можешь. Делай, что можешь.", author: "Арчи Карр" },
+      { text: "Если ты не рискуешь, ты не можешь создать будущее.", author: "Анастасия Сталь" },
+      { text: "Лучший способ предсказать будущее — создать его.", author: "Питер Друкер" },
+      { text: "Неудача — это просто возможность начать снова, но уже более мудро.", author: "Генри Форд" },
+      { text: "Ты не обязан быть великим, чтобы начать, но ты должен начать, чтобы быть великим.", author: "Лес Браун" },
+      { text: "Даже если ты идёшь в правильном направлении, ты всё равно проиграешь, если просто стоишь на месте.", author: "Уилл Роджерс" },
+      { text: "Единственный способ сделать великие дела — любить то, что ты делаешь.", author: "Стив Джобс" },
+      { text: "Всё, что ты можешь вообразить, — реально.", author: "Пабло Пикассо" },
+      { text: "Делай сегодня то, что другие не хотят, и завтра будешь жить так, как другие не могут.", author: "Джерри Райс" },
+      { text: "Цели — это мечты с дедлайнами.", author: "Дейна Гибсон" },
+      { text: "Самый опасный способ потерпеть неудачу — это действовать по инерции.", author: "Мэл Роббинс" },
+      { text: "Ты не обязан контролировать ветер, но ты можешь настроить паруса.", author: "Джим Рон" },
+      { text: "Маленькие шаги каждый день ведут к большим результатам.", author: "Робин Шарма" },
+      { text: "Ты становишься тем, во что веришь.", author: "Пауло Коэльо" },
+      { text: "Трудности — это возможности для роста.", author: "Конфуций" }
+    ];
+
+    const quoteText = document.getElementById('quote-text');
+    const quoteAuthor = document.getElementById('quote-author');
+    const nextBtn = document.getElementById('next-btn');
+    const copyBtn = document.getElementById('copy-btn');
+    const themeToggle = document.getElementById('theme-toggle');
+    const sound = document.getElementById('sound');
+    const icon = themeToggle.querySelector('i');
+
+    let currentIndex = 0;
+    const animations = ['fadeInUp', 'fadeInDown', 'zoomIn', 'fadeInLeft', 'fadeInRight'];
+
+    function getRandomAnimation() {
+      return animations[Math.floor(Math.random() * animations.length)];
+    }
+
+    function showQuote(index) {
+      quoteText.classList.remove('visible');
+      quoteAuthor.classList.remove('visible');
+      quoteText.style.animation = 'none';
+      quoteAuthor.style.animation = 'none';
+
+      setTimeout(() => {
+        quoteText.textContent = quotes[index].text;
+        quoteAuthor.textContent = `— ${quotes[index].author}`;
+
+        const anim = getRandomAnimation();
+        quoteText.style.animation = `${anim} 1.2s ease forwards`;
+        quoteAuthor.style.animation = `fadeInUp 1.2s 0.3s ease forwards`;
+
+        quoteText.classList.add('visible');
+        quoteAuthor.classList.add('visible');
+
+        // Звук
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+
+        // Сохранение
+        localStorage.setItem('lastQuoteIndex', index);
+      }, 500);
+    }
+
+    function nextQuote() {
+      let next;
+      do {
+        next = Math.floor(Math.random() * quotes.length);
+      } while (quotes.length > 1 && next === currentIndex);
+      currentIndex = next;
+      showQuote(currentIndex);
+    }
+
+    nextBtn.addEventListener('click', nextQuote);
+
+    copyBtn.addEventListener('click', () => {
+      const text = `"${quoteText.textContent}"\n${quoteAuthor.textContent}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('✅ Цитата скопирована!');
+      }).catch(() => {
+        prompt('Скопируйте вручную:', text);
+      });
+    });
+
+    // Смена темы
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      const isLight = document.body.classList.contains('light');
+      
+      if (isLight) {
+        icon.className = 'fas fa-sun';
+        themeToggle.setAttribute('aria-label', 'Тёмная тема');
+      } else {
+        icon.className = 'fas fa-moon';
+        themeToggle.setAttribute('aria-label', 'Светлая тема');
+      }
+
+      localStorage.setItem('lightTheme', isLight);
+    });
+
+    // Автосмена каждые 10 секунд
+    setInterval(nextQuote, 10000);
+
+    // Восстановление при загрузке
+    window.onload = () => {
+      const savedIndex = localStorage.getItem('lastQuoteIndex');
+      if (savedIndex !== null) {
+        currentIndex = parseInt(savedIndex);
+      }
+      showQuote(currentIndex);
+
+      const isLight = localStorage.getItem('lightTheme') === 'true';
+      if (isLight) {
+        document.body.classList.add('light');
+        icon.className = 'fas fa-sun';
+        themeToggle.setAttribute('aria-label', 'Тёмная тема');
+      }
+    };
+  </script>
+</body>
+</html>
