@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Мотивация на каждый день — вдохновляющие цитаты каждые 10 секунд</title>
-  <meta name="description" content="Бесплатный сайт с мотивационными цитатами великих людей. Поднимите настроение, сфокусируйтесь, получите вдохновение — каждый день.">
-  <meta name="keywords" content="мотивация, цитаты, саморазвитие, вдохновение, успех, ежедневная мотивация, цитаты великих">
+  <title>Мотивация на каждый день — вдохновляющие цитаты</title>
+  <meta name="description" content="Сайт с мотивационными цитатами. Каждые 10 секунд — новая мысль для роста и силы.">
+  <meta name="keywords" content="мотивация, цитаты, саморазвитие, вдохновение, успех">
   <meta name="author" content="Killanline">
   <meta name="robots" content="index, follow">
 
-  <!-- Open Graph — для соцсетей -->
+  <!-- Open Graph -->
   <meta property="og:title" content="Мотивация на каждый день">
-  <meta property="og:description" content="Вдохновляющие цитаты каждые 10 секунд — для силы, веры и действия.">
+  <meta property="og:description" content="Цитаты великих — для силы, веры и действия.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://killanline.github.io/motivation">
-  <meta property="og:image" content="https://via.placeholder.com/1200x630/000000/FFFFFF?text=Мотивация+на+каждый+день">
+  <meta property="og:image" content="https://via.placeholder.com/1200x630/000000/FFFFFF?text=Мотивация">
 
   <!-- Favicon -->
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1274/1274255.png" type="image/x-icon">
@@ -31,26 +31,94 @@
 
     body {
       font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #000000, #111111);
+      background: #000;
       color: white;
       min-height: 100vh;
+      overflow: hidden;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
       text-align: center;
       padding: 20px;
-      transition: background 1s, color 0.5s;
+      position: relative;
     }
 
-    body.light {
-      background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
-      color: #111;
+    /* Фон частиц */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
     }
 
-    body.light .author {
-      color: #555;
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      animation: float linear infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.8;
+      }
+      90% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(50px);
+        opacity: 0;
+      }
+    }
+
+    /* Заставка */
+    .splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 1s ease;
+    }
+
+    .splash-logo {
+      font-size: 10vmin;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      color: white;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .splash.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Основной контент */
+    .content {
+      position: relative;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .content.show {
+      opacity: 1;
     }
 
     .quote {
@@ -59,8 +127,13 @@
       line-height: 1.6;
       opacity: 0;
       transform: translateY(20px);
-      transition: all 0.5s ease;
+      transition: opacity 1.2s ease, transform 1.2s ease;
       margin-bottom: 40px;
+      font-weight: 500;
+      min-height: 3.2em;
+      text-align: center;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .quote.visible {
@@ -72,7 +145,10 @@
       font-style: italic;
       font-size: 1.2rem;
       opacity: 0.8;
-      transition: opacity 0.5s;
+      transition: opacity 1.2s ease;
+      min-height: 1.8em;
+      line-height: 1.6;
+      text-align: center;
     }
 
     .controls {
@@ -126,7 +202,6 @@
       font-size: 14px;
       padding: 6px 12px;
       border-radius: 6px;
-      white-space: nowrap;
       opacity: 0;
       visibility: hidden;
       transition: all 0.3s ease;
@@ -154,55 +229,83 @@
         height: 50px;
         font-size: 1.2rem;
       }
-    }
-
-    @media (max-width: 400px) {
       .quote {
         font-size: 1.6rem;
+        min-height: 2.8em;
       }
       .author {
         font-size: 1.1rem;
+        min-height: 1.6em;
       }
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(40px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-40px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes zoomIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    @keyframes fadeInLeft {
-      from { opacity: 0; transform: translateX(-40px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes fadeInRight {
-      from { opacity: 0; transform: translateX(40px); }
-      to { opacity: 1; transform: translateX(0); }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <p class="quote" id="quote-text">Добро пожаловать!</p>
-    <p class="author" id="quote-author">— Загрузка...</p>
+  <!-- Заставка -->
+  <div class="splash" id="splash">
+    <div class="splash-logo">KILLA</div>
   </div>
 
-  <div class="controls">
-    <button id="next-btn" aria-label="Следующая цитата"><i class="fas fa-play"></i></button>
-    <button id="copy-btn" aria-label="Скопировать цитату"><i class="fas fa-copy"></i></button>
-    <button id="theme-toggle" aria-label="Светлая тема"><i class="fas fa-moon"></i></button>
+  <!-- Частицы -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Основной контент -->
+  <div class="content" id="content">
+    <div class="container">
+      <p class="quote" id="quote-text">Добро пожаловать!</p>
+      <p class="author" id="quote-author">— Загрузка...</p>
+    </div>
+
+    <div class="controls">
+      <button id="next-btn" aria-label="Следующая цитата"><i class="fas fa-play"></i></button>
+      <button id="copy-btn" aria-label="Скопировать цитату"><i class="fas fa-copy"></i></button>
+      <button id="theme-toggle" aria-label="Светлая тема"><i class="fas fa-moon"></i></button>
+    </div>
   </div>
 
-  <!-- Звук при смене цитаты -->
+  <!-- Звук -->
   <audio id="sound" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" preload="auto"></audio>
 
   <script>
+    // === Заставка ===
+    const splash = document.getElementById('splash');
+    const content = document.getElementById('content');
+
+    // Убираем заставку через 2 сек
+    setTimeout(() => {
+      splash.classList.add('fade-out');
+      setTimeout(() => {
+        splash.style.display = 'none';
+        content.classList.add('show');
+      }, 1000);
+    }, 2000);
+
+    // === Частицы ===
+    const particles = document.getElementById('particles');
+    const colors = ['rgba(255, 255, 255, 0.6)', 'rgba(200, 200, 255, 0.4)', 'rgba(255, 200, 200, 0.3)'];
+    const numParticles = 30;
+
+    for (let i = 0; i < numParticles; i++) {
+      const p = document.createElement('div');
+      p.classList.add('particle');
+
+      const size = Math.random() * 3 + 1;
+      const delay = Math.random() * 10;
+      const duration = Math.random() * 10 + 10;
+      const start = Math.random() * window.innerWidth;
+
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.left = `${start}px`;
+      p.style.bottom = '-10px';
+      p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDuration = `${duration}s`;
+      p.style.animationDelay = `${delay}s`;
+
+      particles.appendChild(p);
+    }
+
+    // === Цитаты ===
     const quotes = [
       { text: "Ваше время ограничено, не тратьте его, живя чужой жизнью.", author: "Стив Джобс" },
       { text: "Успех — это способность идти от неудачи к неудаче, не теряя энтузиазма.", author: "Уинстон Черчилль" },
@@ -260,7 +363,7 @@
         sound.play().catch(() => {});
 
         localStorage.setItem('lastQuoteIndex', index);
-      }, 500);
+      }, 50);
     }
 
     function nextQuote() {
@@ -300,22 +403,14 @@
 
       document.body.appendChild(popup);
 
-      setTimeout(() => {
-        popup.style.opacity = '1';
-      }, 10);
-
+      setTimeout(() => popup.style.opacity = '1', 10);
       setTimeout(() => {
         popup.style.opacity = '0';
-        setTimeout(() => {
-          if (popup.parentNode) {
-            popup.parentNode.removeChild(popup);
-          }
-        }, 300);
+        setTimeout(() => popup.remove(), 300);
       }, 2000);
     }
 
     nextBtn.addEventListener('click', nextQuote);
-
     copyBtn.addEventListener('click', () => {
       const text = `"${quoteText.textContent}"\n${quoteAuthor.textContent}`;
       navigator.clipboard.writeText(text).then(() => {
@@ -328,15 +423,8 @@
     themeToggle.addEventListener('click', () => {
       document.body.classList.toggle('light');
       const isLight = document.body.classList.contains('light');
-      
-      if (isLight) {
-        icon.className = 'fas fa-sun';
-        themeToggle.setAttribute('aria-label', 'Тёмная тема');
-      } else {
-        icon.className = 'fas fa-moon';
-        themeToggle.setAttribute('aria-label', 'Светлая тема');
-      }
-
+      icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+      themeToggle.setAttribute('aria-label', isLight ? 'Тёмная тема' : 'Светлая тема');
       localStorage.setItem('lightTheme', isLight);
     });
 
@@ -344,10 +432,7 @@
 
     window.onload = () => {
       const savedIndex = localStorage.getItem('lastQuoteIndex');
-      if (savedIndex !== null) {
-        currentIndex = parseInt(savedIndex);
-      }
-      showQuote(currentIndex);
+      if (savedIndex !== null) currentIndex = parseInt(savedIndex);
 
       const isLight = localStorage.getItem('lightTheme') === 'true';
       if (isLight) {
@@ -355,6 +440,9 @@
         icon.className = 'fas fa-sun';
         themeToggle.setAttribute('aria-label', 'Тёмная тема');
       }
+
+      // Показываем первую цитату после заставки
+      setTimeout(() => showQuote(currentIndex), 2100);
     };
   </script>
 </body>
