@@ -3,10 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Мотивация каждый день</title>
-  <meta name="description" content="Мотивационные цитаты каждые 10 секунд — для вдохновения и роста">
+  <title>Мотивация на каждый день — вдохновляющие цитаты каждые 10 секунд</title>
+  <meta name="description" content="Бесплатный сайт с мотивационными цитатами великих людей. Поднимите настроение, сфокусируйтесь, получите вдохновение — каждый день.">
+  <meta name="keywords" content="мотивация, цитаты, саморазвитие, вдохновение, успех, ежедневная мотивация, цитаты великих">
+  <meta name="author" content="Killanline">
+  <meta name="robots" content="index, follow">
 
-  <!-- Font Awesome для иконок -->
+  <!-- Open Graph — для соцсетей -->
+  <meta property="og:title" content="Мотивация на каждый день">
+  <meta property="og:description" content="Вдохновляющие цитаты каждые 10 секунд — для силы, веры и действия.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://killanline.github.io/motivation">
+  <meta property="og:image" content="https://via.placeholder.com/1200x630/000000/FFFFFF?text=Мотивация+на+каждый+день">
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1274/1274255.png" type="image/x-icon">
+
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -86,7 +99,6 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
-    /* Темы кнопок */
     body.light button#next-btn,
     body.light button#copy-btn {
       background: #000;
@@ -98,13 +110,11 @@
       color: #111;
     }
 
-    /* Эффект при наведении */
     button:hover {
       transform: scale(1.1);
       box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
 
-    /* Подсказки при наведении */
     button::after {
       content: attr(aria-label);
       position: absolute;
@@ -132,14 +142,29 @@
       visibility: visible;
     }
 
-    /* Мобильные — убираем подсказки */
     @media (max-width: 600px) {
       button::after {
         display: none;
       }
+      .controls {
+        gap: 15px;
+      }
+      button {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+      }
     }
 
-    /* Анимации */
+    @media (max-width: 400px) {
+      .quote {
+        font-size: 1.6rem;
+      }
+      .author {
+        font-size: 1.1rem;
+      }
+    }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(40px); }
       to { opacity: 1; transform: translateY(0); }
@@ -204,8 +229,8 @@
     const nextBtn = document.getElementById('next-btn');
     const copyBtn = document.getElementById('copy-btn');
     const themeToggle = document.getElementById('theme-toggle');
-    const sound = document.getElementById('sound');
     const icon = themeToggle.querySelector('i');
+    const sound = document.getElementById('sound');
 
     let currentIndex = 0;
     const animations = ['fadeInUp', 'fadeInDown', 'zoomIn', 'fadeInLeft', 'fadeInRight'];
@@ -231,11 +256,9 @@
         quoteText.classList.add('visible');
         quoteAuthor.classList.add('visible');
 
-        // Звук
         sound.currentTime = 0;
         sound.play().catch(() => {});
 
-        // Сохранение
         localStorage.setItem('lastQuoteIndex', index);
       }, 500);
     }
@@ -249,18 +272,59 @@
       showQuote(currentIndex);
     }
 
+    function showPopup(message) {
+      const oldPopup = document.getElementById('motivation-popup');
+      if (oldPopup) oldPopup.remove();
+
+      const popup = document.createElement('div');
+      popup.id = 'motivation-popup';
+      popup.textContent = message;
+      popup.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-size: 16px;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        white-space: nowrap;
+      `;
+
+      document.body.appendChild(popup);
+
+      setTimeout(() => {
+        popup.style.opacity = '1';
+      }, 10);
+
+      setTimeout(() => {
+        popup.style.opacity = '0';
+        setTimeout(() => {
+          if (popup.parentNode) {
+            popup.parentNode.removeChild(popup);
+          }
+        }, 300);
+      }, 2000);
+    }
+
     nextBtn.addEventListener('click', nextQuote);
 
     copyBtn.addEventListener('click', () => {
       const text = `"${quoteText.textContent}"\n${quoteAuthor.textContent}`;
       navigator.clipboard.writeText(text).then(() => {
-        alert('✅ Цитата скопирована!');
+        showPopup('✅ Цитата скопирована!');
       }).catch(() => {
-        prompt('Скопируйте вручную:', text);
+        showPopup('⚠️ Не удалось скопировать');
       });
     });
 
-    // Смена темы
     themeToggle.addEventListener('click', () => {
       document.body.classList.toggle('light');
       const isLight = document.body.classList.contains('light');
@@ -276,10 +340,8 @@
       localStorage.setItem('lightTheme', isLight);
     });
 
-    // Автосмена каждые 10 секунд
     setInterval(nextQuote, 10000);
 
-    // Восстановление при загрузке
     window.onload = () => {
       const savedIndex = localStorage.getItem('lastQuoteIndex');
       if (savedIndex !== null) {
